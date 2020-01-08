@@ -19,7 +19,7 @@ int init(u_short *);
 int get_line(int, char *, int);
 void headers(int, const char *);
 void unsupported(int); 
-void read(int, FILE *);  
+void cat(int, FILE *);  
 void serve_file(int, const char *);
 void not_found(int);
 void bad_request(int);
@@ -131,7 +131,7 @@ void unsupported(int client)
     sprintf(buf, "</BODY></HTML>\r\n");
     send(client, buf, strlen(buf), 0);
 }
-void read(int client, FILE *resource)
+void cat(int client, FILE *resource)
 {
     char buf[1024];
 
@@ -163,7 +163,7 @@ void serve_file(int client, const char *filename)
         /*写 HTTP header */
         headers(client, filename);
         /*复制文件*/
-        read(client, resource);
+        cat(client, resource);
     }
     fclose(resource);
 }
