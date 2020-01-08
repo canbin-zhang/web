@@ -17,6 +17,7 @@
 #define SERVER_STRING "Server: jdbhttpd/0.1.0\r\n" 
 int init(u_short *);
 int get_line(int, char *, int);
+void headers(int, const char *);
 int init(u_short *port)  
 {  
     int httpd = 0;  
@@ -83,4 +84,20 @@ int get_line(int sock, char *buf, int size)
 
     /*返回 buf 数组大小*/
     return(i);
+}
+void headers(int client, const char *filename)
+{
+    char buf[1024];
+    (void)filename;  /* could use filename to determine file type */
+
+    /*正常的 HTTP header */
+    strcpy(buf, "HTTP/1.0 200 OK\r\n");
+    send(client, buf, strlen(buf), 0);
+    /*服务器信息*/
+    strcpy(buf, SERVER_STRING);
+    send(client, buf, strlen(buf), 0);
+    sprintf(buf, "Content-Type: text/html\r\n");
+    send(client, buf, strlen(buf), 0);
+    strcpy(buf, "\r\n");
+    send(client, buf, strlen(buf), 0);
 }
