@@ -21,6 +21,7 @@ void headers(int, const char *);
 void unsupported(int); 
 void read(int, FILE *);  
 void serve_file(int, const char *);
+void not_found(int);
 int init(u_short *port)  
 {  
     int httpd = 0;  
@@ -162,4 +163,29 @@ void serve_file(int client, const char *filename)
         read(client, resource);
     }
     fclose(resource);
+}
+void not_found(int client)
+{
+    char buf[1024];
+
+    /* 404 页面 */
+    sprintf(buf, "HTTP/1.0 404 NOT FOUND\r\n");
+    send(client, buf, strlen(buf), 0);
+    /*服务器信息*/
+    sprintf(buf, SERVER_STRING);
+    send(client, buf, strlen(buf), 0);
+    sprintf(buf, "Content-Type: text/html\r\n");
+    send(client, buf, strlen(buf), 0);
+    sprintf(buf, "\r\n");
+    send(client, buf, strlen(buf), 0);
+    sprintf(buf, "<HTML><TITLE>Not Found</TITLE>\r\n");
+    send(client, buf, strlen(buf), 0);
+    sprintf(buf, "<BODY><P>The server could not fulfill\r\n");
+    send(client, buf, strlen(buf), 0);
+    sprintf(buf, "your request because the resource specified\r\n");
+    send(client, buf, strlen(buf), 0);
+    sprintf(buf, "is unavailable or nonexistent.\r\n");
+    send(client, buf, strlen(buf), 0);
+    sprintf(buf, "</BODY></HTML>\r\n");
+    send(client, buf, strlen(buf), 0);
 }
