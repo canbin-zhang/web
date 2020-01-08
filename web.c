@@ -18,6 +18,7 @@
 int init(u_short *);
 int get_line(int, char *, int);
 void headers(int, const char *);
+void unsupported(int);  
 int init(u_short *port)  
 {  
     int httpd = 0;  
@@ -99,5 +100,28 @@ void headers(int client, const char *filename)
     sprintf(buf, "Content-Type: text/html\r\n");
     send(client, buf, strlen(buf), 0);
     strcpy(buf, "\r\n");
+    send(client, buf, strlen(buf), 0);
+}
+void unsupported(int client)
+{
+    char buf[1024];
+
+    /* HTTP method 不被支持*/
+    sprintf(buf, "HTTP/1.0 501 Method Not Implemented\r\n");
+    send(client, buf, strlen(buf), 0);
+    /*服务器信息*/
+    sprintf(buf, SERVER_STRING);
+    send(client, buf, strlen(buf), 0);
+    sprintf(buf, "Content-Type: text/html\r\n");
+    send(client, buf, strlen(buf), 0);
+    sprintf(buf, "\r\n");
+    send(client, buf, strlen(buf), 0);
+    sprintf(buf, "<HTML><HEAD><TITLE>Method Not Implemented\r\n");
+    send(client, buf, strlen(buf), 0);
+    sprintf(buf, "</TITLE></HEAD>\r\n");
+    send(client, buf, strlen(buf), 0);
+    sprintf(buf, "<BODY><P>HTTP request method not supported.\r\n");
+    send(client, buf, strlen(buf), 0);
+    sprintf(buf, "</BODY></HTML>\r\n");
     send(client, buf, strlen(buf), 0);
 }
