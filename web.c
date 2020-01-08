@@ -18,7 +18,8 @@
 int init(u_short *);
 int get_line(int, char *, int);
 void headers(int, const char *);
-void unsupported(int);  
+void unsupported(int); 
+void read(int, FILE *);  
 int init(u_short *port)  
 {  
     int httpd = 0;  
@@ -124,4 +125,16 @@ void unsupported(int client)
     send(client, buf, strlen(buf), 0);
     sprintf(buf, "</BODY></HTML>\r\n");
     send(client, buf, strlen(buf), 0);
+}
+void cat(int client, FILE *resource)
+{
+    char buf[1024];
+
+    /*读取文件中的所有数据写到 socket */
+    fgets(buf, sizeof(buf), resource);
+    while (!feof(resource))
+    {
+        send(client, buf, strlen(buf), 0);
+        fgets(buf, sizeof(buf), resource);
+    }
 }
