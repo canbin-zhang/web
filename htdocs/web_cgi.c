@@ -6,6 +6,7 @@
              long m,n;
              printf("Content-type: text/html\n\n");
              printf("<TITLE>Mult Result</TITLE>");
+	     printf("<HEAD><meta charset='UFT-8'></HEAD>");
            printf("<H3>计算结果：</H3>");
   
           data = getenv("QUERY_STRING");
