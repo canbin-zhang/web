@@ -23,6 +23,7 @@ void read(int, FILE *);
 void serve_file(int, const char *);
 void not_found(int);
 void bad_request(int);
+void error_die(const char *);
 int init(u_short *port)  
 {  
     int httpd = 0;  
@@ -129,7 +130,7 @@ void unsupported(int client)
     sprintf(buf, "</BODY></HTML>\r\n");
     send(client, buf, strlen(buf), 0);
 }
-void cat(int client, FILE *resource)
+void read(int client, FILE *resource)
 {
     char buf[1024];
 
@@ -205,4 +206,10 @@ void bad_request(int client)
     send(client, buf, sizeof(buf), 0);
     sprintf(buf, "such as a POST without a Content-Length.\r\n");
     send(client, buf, sizeof(buf), 0);
+}
+void error_die(const char *sc)
+{
+    /*出错信息处理 */
+    perror(sc);
+    exit(1);
 }
