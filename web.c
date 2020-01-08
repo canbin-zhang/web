@@ -433,4 +433,33 @@ void accept_request(int client)
   
     /*断开与客户端的连接（HTTP 特点：无连接）*/  
     close(client);  
-}  
+}
+int main(void)
+{
+    int server_sock = -1;
+    u_short port = 0;
+    int client_sock = -1;
+    struct sockaddr_in client_name;
+    int client_name_len = sizeof(client_name);
+    pthread_t newthread;
+
+    /*在对应端口建立 httpd 服务*/
+    server_sock = init(&port);
+    printf("httpd running on port %d\n", port);
+
+    while (1)
+    {
+        /*套接字收到客户端连接请求*/
+        client_sock = accept(server_sock,(struct sockaddr *)&client_name,&client_name_len);
+        if (client_sock == -1)
+            error_die("accept");
+        /*派生新线程用 accept_request 函数处理新请求*/
+        /* accept_request(client_sock); */
+        if (pthread_create(&newthread , NULL, accept_request, client_sock) != 0)
+            perror("pthread_create");
+    }
+
+    close(server_sock);
+
+    return(0);
+}
