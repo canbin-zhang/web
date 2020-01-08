@@ -20,6 +20,7 @@ int get_line(int, char *, int);
 void headers(int, const char *);
 void unsupported(int); 
 void read(int, FILE *);  
+void serve_file(int, const char *);
 int init(u_short *port)  
 {  
     int httpd = 0;  
@@ -137,4 +138,28 @@ void cat(int client, FILE *resource)
         send(client, buf, strlen(buf), 0);
         fgets(buf, sizeof(buf), resource);
     }
+}
+void serve_file(int client, const char *filename)
+{
+    FILE *resource = NULL;
+    int numchars = 1;
+    char buf[1024];
+
+    /*读取并丢弃 header */
+    buf[0] = 'A'; buf[1] = '\0';
+    while ((numchars > 0) && strcmp("\n", buf))  /* read & discard headers */
+        numchars = get_line(client, buf, sizeof(buf));
+
+    /*打开 sever 的文件*/
+    resource = fopen(filename, "r");
+    if (resource == NULL)
+        not_found(client);
+    else
+    {
+        /*写 HTTP header */
+        headers(client, filename);
+        /*复制文件*/
+        read(client, resource);
+    }
+    fclose(resource);
 }
