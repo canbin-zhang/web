@@ -16,6 +16,7 @@
   
 #define SERVER_STRING "Server: jdbhttpd/0.1.0\r\n" 
 int init(u_short *);
+int get_line(int, char *, int);
 int init(u_short *port)  
 {  
     int httpd = 0;  
@@ -45,3 +46,41 @@ int init(u_short *port)
     /*返回 socket id */  
     return(httpd);  
 }  
+int get_line(int sock, char *buf, int size)
+{
+    int i = 0;
+    char c = '\0';
+    int n;
+
+    /*把终止条件统一为 \n 换行符，标准化 buf 数组*/
+    while ((i < size - 1) && (c != '\n'))
+    {
+        /*一次仅接收一个字节*/
+        n = recv(sock, &c, 1, 0);
+        /* DEBUG printf("%02X\n", c); */
+        if (n > 0)
+        {
+            /*收到 \r 则继续接收下个字节，因为换行符可能是 \r\n */
+            if (c == '\r')
+            {
+                /*使用 MSG_PEEK 标志使下一次读取依然可以得到这次读取的内容，可认为接收窗口不滑动*/
+                n = recv(sock, &c, 1, MSG_PEEK);
+                /* DEBUG printf("%02X\n", c); */
+                /*但如果是换行符则把它吸收掉*/
+                if ((n > 0) && (c == '\n'))
+                    recv(sock, &c, 1, 0);
+                else
+                    c = '\n';
+            }
+            /*存到缓冲区*/
+            buf[i] = c;
+            i++;
+        }
+        else
+            c = '\n';
+    }
+    buf[i] = '\0';
+
+    /*返回 buf 数组大小*/
+    return(i);
+}
