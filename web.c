@@ -25,6 +25,7 @@ void not_found(int);
 void bad_request(int);
 void error_die(const char *);
 void execute_cgi(int, const char *, const char *, const char *);
+void cannot_execute(int);
 int init(u_short *port)  
 {  
     int httpd = 0;  
@@ -325,3 +326,18 @@ void execute_cgi(int client, const char *path, const char *method, const char *q
         waitpid(pid, &status, 0);
     }
 }
+void cannot_execute(int client)
+{
+    char buf[1024];
+
+    /* 回应客户端 cgi 无法执行*/
+    sprintf(buf, "HTTP/1.0 500 Internal Server Error\r\n");
+    send(client, buf, strlen(buf), 0);
+    sprintf(buf, "Content-type: text/html\r\n");
+    send(client, buf, strlen(buf), 0);
+    sprintf(buf, "\r\n");
+    send(client, buf, strlen(buf), 0);
+    sprintf(buf, "<P>Error prohibited CGI execution.\r\n");
+    send(client, buf, strlen(buf), 0);
+}
+
