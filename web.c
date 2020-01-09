@@ -185,7 +185,7 @@ void not_found(int client)
     send(client, buf, strlen(buf), 0);
     sprintf(buf, "<HTML><TITLE>Not Found</TITLE>\r\n");
     send(client, buf, strlen(buf), 0);
-    sprintf(buf, "<BODY><P>The server could not fulfill\r\n");
+    sprintf(buf, "<BODY><P>404!!<br><P>The server could not fulfill\r\n");
     send(client, buf, strlen(buf), 0);
     sprintf(buf, "your request because the resource specified\r\n");
     send(client, buf, strlen(buf), 0);
